@@ -34,20 +34,20 @@ public class ProductList {
 
     }
 
-//    public VBox getDummyTable()
-//    {
-//        ObservableList<Product> data = FXCollections.observableArrayList();
-//        data.add(new Product(2,"Iphone",55124));
-//        data.add(new Product(5,"Oppo",22603));
-//
-//        return createTable(data);
-//    }
-
     public VBox getAllProducts()
     {
         ObservableList<Product> data = Product.getAllProducts();
         return createTable(data);
     }
+    public VBox getAllProducts(String str)
+    {
+        ObservableList<Product> data = Product.getAllProducts(str);
+        if (data == null || data.isEmpty()) {
+            return null;
+        }
+        return createTable(data);
+    }
+
 
     public Product getSelectedProduct()
     {

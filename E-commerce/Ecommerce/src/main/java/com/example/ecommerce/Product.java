@@ -26,6 +26,12 @@ public class Product {
 
         return fetchProductData(selectAllProducts);
     }
+    public static ObservableList<Product> getAllProducts(String str)
+    {
+        String selectAllProducts = "select id, name, price from product where name like '%"+str+"%'";
+
+        return fetchProductData(selectAllProducts);
+    }
 
     public static ObservableList<Product> fetchProductData(String query)
     {

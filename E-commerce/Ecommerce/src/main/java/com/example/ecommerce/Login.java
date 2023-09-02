@@ -24,6 +24,26 @@ public class Login {
         }
         return null;
     }
+    public Customer customerLogin(String username)
+    {
+        String loginQuery = "select * from customers where email = '"+username+"'";
+        DbConnection conn = new DbConnection();
+        ResultSet rs = conn.getQueryTable(loginQuery);
+
+        try
+        {
+            if(rs.next())
+            {
+                return new Customer(rs.getInt("id"), rs.getString("name"),
+                        rs.getString("email"), rs.getString("mobile"));
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public static void main(String[] args) {
         Login login = new Login();

@@ -13,7 +13,6 @@ package com.example.ecommerce;
 public class ordersproduct {
     private SimpleIntegerProperty product_id;
     private SimpleStringProperty order_date;
-
     private SimpleStringProperty order_status;
 
     public ordersproduct(int product_id,String ordered_date, String order_status) {

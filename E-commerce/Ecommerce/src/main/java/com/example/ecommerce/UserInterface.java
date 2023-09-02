@@ -11,12 +11,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
+import javafx.scene.control.TextFormatter;
+import java.util.function.UnaryOperator;
+import javafx.scene.control.TextFormatter.Change;
 
 public class UserInterface {
-    ordertable ordertable=new ordertable();
+    ordertable ordertable = new ordertable();
     VBox orderpage;
 
     GridPane loginPage;
+    GridPane signUppage;
     HBox headerBar;
     HBox footerBar;
     Button signInButton;
@@ -29,7 +33,17 @@ public class UserInterface {
     VBox productPage;
     Button placeOrderButton = new Button("Place Order");
 
+    Button logoutButton = new Button("Log Out");
+
+    Button innerSignIn = new Button("Sign In");
+
     ObservableList<Product> itemsInCart = FXCollections.observableArrayList();
+    TextField userName = new TextField();
+    PasswordField password = new PasswordField();
+    Label messageLable = new Label("Hi");
+
+    Button signupButton = new Button("Sign Up");
+
     public BorderPane createContent()
     {
         BorderPane root = new BorderPane();
@@ -38,7 +52,7 @@ public class UserInterface {
         root.setTop(headerBar);
 
 //        root.setCenter(loginPage);
-        orderpage =ordertable.getoder();
+//        orderpage =ordertable.getoder();
 
         body = new VBox();
         body.setPadding(new Insets(10));
@@ -46,6 +60,7 @@ public class UserInterface {
         root.setCenter(body);
         productPage = productList.getAllProducts();
         body.getChildren().add(productPage);
+        body.setStyle("-fx-background-color:grey");
 
         root.setBottom(footerBar);
 
@@ -56,18 +71,19 @@ public class UserInterface {
         createLoginPage();
         createHeaderBar();
         createFooterBar();
+        createsignupPage();
     }
     private void createLoginPage()
     {
         Text userNameText = new Text("User Name");
         Text passwordText = new Text("Password");
 
-        TextField userName = new TextField();
+//        TextField userName = new TextField();
         userName.setPromptText("Type your user name here");
-        PasswordField password = new PasswordField();
+//        PasswordField password = new PasswordField();
         password.setPromptText("Type your password here");
 
-        Label messageLable = new Label("Hi");
+        Label signupLable = new Label("If you don't have an account please Sign Up here");
 
         // creating a login button
         Button loginButton = new Button("Login");
@@ -84,7 +100,9 @@ public class UserInterface {
         loginPage.add(password,1,1);
         loginPage.add(messageLable,0,2);
         loginPage.add(loginButton,1,2);
-
+        loginPage.add(signupLable,0,3);
+        loginPage.add(signupButton,1,3);
+        
         loginButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -96,6 +114,7 @@ public class UserInterface {
                 {
                     messageLable.setText("Welcome "+ loggedInCustomer.getName());
                     welcomeLabel.setText("Welcome " + loggedInCustomer.getName());
+                    headerBar.getChildren().add(logoutButton);
                     headerBar.getChildren().add(welcomeLabel);
                     body.getChildren().clear();
                     body.getChildren().add(productPage);
@@ -106,9 +125,87 @@ public class UserInterface {
             }
         });
     }
+    private void createsignupPage()
+    {
+        Text signupUserNameText = new Text("User Name");
+        Text signUpUseremailText = new Text("E-mail");
+        Text signUpPasswordText = new Text("Enter your Password");
+        Text signUpmobileText = new Text("Enter your Mobile Number");
 
+        TextField signupUserName = new TextField();
+        signupUserName.setPromptText("Enter your User Name");
+        TextField signUpUseremail = new TextField();
+        signUpUseremail.setPromptText("Enter your E-mail");
+        PasswordField signUpPassword = new PasswordField();
+        signUpPassword.setPromptText("Enter your Password");
+        TextField signUpmobile = new TextField();
+        signUpmobile.setPromptText("Enter your Mobile Number");
+
+
+        UnaryOperator<Change> filter = change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("\\d{0,10}")) {
+                return change;
+            }
+            return null;
+        };
+
+        TextFormatter<String> textFormatter = new TextFormatter<>(filter);
+        signUpmobile.setTextFormatter(textFormatter);
+
+        signUppage = new GridPane();
+        signUppage.setAlignment(Pos.CENTER);
+
+        signUppage.setHgap(10);
+        signUppage.setVgap(10);
+
+        signUppage.add(signupUserNameText,0,0);
+        signUppage.add(signupUserName,1,0);
+        signUppage.add(signUpUseremailText,0,1);
+        signUppage.add(signUpUseremail,1,1);
+        signUppage.add(signUpPasswordText,0,2);
+        signUppage.add(signUpPassword,1,2);
+        signUppage.add(signUpmobileText,0,3);
+        signUppage.add(signUpmobile,1,3);
+        signUppage.add(innerSignIn,1,4);
+
+        signupButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                body.getChildren().clear();
+                body.getChildren().add(signUppage);
+                signUpmobile.clear();
+                signUpPassword.clear();
+                signupUserName.clear();
+                signUpUseremail.clear();
+            }
+        });
+
+        innerSignIn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Login login = new Login();
+                Customer sin =  login.customerLogin(signUpUseremail.getText());
+                if(sin == null)
+                {
+                    NewUser.getNewUser(signupUserName.getText(),signUpUseremail.getText(),signUpPassword.getText(),signUpmobile.getText());
+                    body.getChildren().clear();
+                    body.getChildren().add(loginPage);
+                }
+                else {
+                    showDialog("User already exits");
+                }
+            }
+        });
+    }
     private void createHeaderBar()
     {
+        Image logo = new Image("C:\\Users\\ADMIN\\Desktop\\E-commerce\\Ecommerce\\src\\main\\resources\\56afea50b83164e3e272d4ebeccd94fb.png");
+        ImageView logoView = new ImageView();
+        logoView.setImage(logo);
+        logoView.setFitHeight(35);
+        logoView.setFitWidth(100);
+
         Button homeButton = new Button();
         Image image = new Image("C:\\Users\\ADMIN\\Desktop\\E-commerce\\Ecommerce\\src\\img_5710.png.crdownload");
         ImageView imageview = new ImageView();
@@ -133,11 +230,31 @@ public class UserInterface {
         headerBar.setPadding(new Insets(10)); // add padding at top of the header
         headerBar.setSpacing(10); // here 10 the gap B/W the element in the Hbox
         headerBar.setAlignment(Pos.CENTER);  // setting header into centre;
-        headerBar.getChildren().addAll(homeButton ,searchBar,searchButton, signInButton, cartButton, orderbutton);
+        headerBar.getChildren().addAll(logoView,homeButton ,searchBar,searchButton, cartButton, orderbutton, signInButton);
+        searchButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                body.getChildren().clear();
+                String str=searchBar.getText();
 
+                productPage=productList.getAllProducts(str);
+                if(productPage == null)
+                {
+                    Image productImage = new Image("C:\\Users\\ADMIN\\Desktop\\E-commerce\\Ecommerce\\src\\main\\resources\\no-product-found.png");
+                    ImageView productImageView = new ImageView();
+                    productImageView.setImage(productImage);
+                    productImageView.setFitWidth(500);
+                    productImageView.setFitHeight(400);
+                    body.getChildren().add(productImageView);
+                    return;
+                }
+                body.getChildren().add(productPage);
+            }
+        });
         orderbutton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                orderpage =ordertable.getoder();
                 body.getChildren().clear();
                 body.getChildren().add(orderpage);
 
@@ -146,8 +263,6 @@ public class UserInterface {
                     if( headerBar.getChildren().indexOf(signInButton)==-1){
                         headerBar.getChildren().add(signInButton);
                     }
-
-
                 }
             }
         });
@@ -155,9 +270,14 @@ public class UserInterface {
         signInButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                userName.setPromptText("Type your user name here");
+                password.setPromptText("Type your password here");
                 body.getChildren().clear(); // clear every thing in the body
                 body.getChildren().add(loginPage); // and add login page on the body
                 headerBar.getChildren().remove(signInButton);
+                userName.clear();
+                password.clear();
+                messageLable.setText("Hi");
             }
         });
 
@@ -199,6 +319,7 @@ public class UserInterface {
         homeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                productPage = productList.getAllProducts();
                 body.getChildren().clear();
                 body.getChildren().add(productPage);
                 footerBar.setVisible(true);
@@ -211,6 +332,18 @@ public class UserInterface {
                 }
             }
         });
+
+        logoutButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                headerBar.getChildren().removeAll(logoutButton,welcomeLabel);
+                headerBar.getChildren().add(signInButton);
+                loggedInCustomer = null;
+
+            }
+        });
+        headerBar.setStyle("-fx-background-color:black");
+        headerBar.setPrefHeight(80);
     }
 
     private void createFooterBar()
@@ -222,6 +355,8 @@ public class UserInterface {
         footerBar.setSpacing(10);
         footerBar.setAlignment(Pos.CENTER);
         footerBar.getChildren().addAll(buyNowButton, addToCartButton);
+        footerBar.setStyle("-fx-background-color:black");
+        footerBar.setPrefHeight(80);
 
         buyNowButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -269,8 +404,5 @@ public class UserInterface {
         alert.setTitle("MESSAGE");
         alert.showAndWait();
     }
-
-
-
-
 }
+
